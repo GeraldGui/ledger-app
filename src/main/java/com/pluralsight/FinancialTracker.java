@@ -2,6 +2,7 @@ package com.pluralsight;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -78,30 +79,42 @@ public class FinancialTracker {
         //       and add it to the transactions list.
 
         try {
-            // Read the file with fileReader in the BufferReader
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            // Checks if the file exist
+            File fileExist = new File(fileName);
 
-            String line;
+            if (fileExist.exists()) {
+                // Read the file with fileReader in the BufferReader
+                FileReader fileReader = new FileReader(fileName);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            // Use while loop to use line to read each line until there is no more to read
-            while ((line = bufferedReader.readLine()) != null) {
+                String line;
 
-                // Creates an array called tokens to then split the line from \\| then stores them into tokens
-                List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\|")));
+                // Use while loop to use line to read each line until there is no more to read
+                while ((line = bufferedReader.readLine()) != null) {
 
-                // Getting the tokens and putting them into the new variables
-                String date = tokens.get(0);
-                String time = tokens.get(1);
-                String description = tokens.get(2);
-                String vendor = tokens.get(3);
-                double amount = Double.parseDouble(tokens.get(4));
+                    // Creates an array called tokens to then split the line from \\| then stores them into tokens
+                    List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\|")));
 
-                // Creating the new objects for each line there is
-                transactions.add(new Transaction(date, time, description, vendor, amount));
+                    // Getting the tokens and putting them into the new variables
+                    String date = tokens.get(0);
+                    String time = tokens.get(1);
+                    String description = tokens.get(2);
+                    String vendor = tokens.get(3);
+                    double amount = Double.parseDouble(tokens.get(4));
+
+                    // Creating the new objects for each line there is
+                    transactions.add(new Transaction(date, time, description, vendor, amount));
+                }
+                // Closes the writer
+                bufferedReader.close();
+            } else {
+                // Creates a new file
+                fileExist.createNewFile();
+
             }
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -117,20 +130,65 @@ public class FinancialTracker {
      * Store the amount as-is (positive) and append to the file.
      */
     private static void addDeposit(Scanner scanner) {
-        // TODO
-        System.out.print("Date & time (yyyy-MM-dd- HH:mm:ss): ");
-        String dateTime = scanner.nextLine();
+        try {
+            // TODO
+            // Writes in the file, made sure to make it append in the file
+            FileWriter fileWriter = new FileWriter(FILE_NAME, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-        System.out.print("Description: ");
-        String description = scanner.nextLine();
+            boolean running = false;
 
-        System.out.print("Vendor: ");
-        String vendor = scanner.nextLine();
+            // Loop will continue to run as long as it is true
+            while (!running) {
+            System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
+            String dateTime = scanner.nextLine();
 
-        System.out.print("Amount (positive): ");
-        double amount = scanner.nextDouble();
+            System.out.print("Description: ");
+            String description = scanner.nextLine();
 
-        System.out.print("Deposit recorded.");
+            System.out.print("Vendor: ");
+            String vendor = scanner.nextLine();
+
+            System.out.print("Amount (positive): ");
+            double amount = scanner.nextDouble();
+
+            // Checks if it is a positive number
+                if (amount > 0) {
+                    // Got the format for the date and then separated them into their own variables
+                    LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
+                    String date = String.valueOf(dateTimeFMT.toLocalDate());
+                    String time = String.valueOf(dateTimeFMT.toLocalTime());
+
+                    // Adds the object to the memory and then appends the variables into the file
+                    transactions.add(new Transaction(date, time, description, vendor, amount));
+                    bufferedWriter.append(date).append("|").append(time).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
+
+                    System.out.print("Deposit recorded.");
+
+                    // Makes running true to close the while loop
+                    running = true;
+                } else {
+                    System.out.println("Invalid Amount!");
+                    System.out.print("Would you like to try again? (Y/N): ");
+                    String stillContinue = scanner.nextLine();
+
+                    if (stillContinue.equalsIgnoreCase("y")) {
+                        System.out.println("Enter your info again.");
+                    } else if (stillContinue.equalsIgnoreCase("n")){
+                        System.out.println("Thank you, sending you back to Menu.");
+                        running = true;
+                    }
+                    else {
+                        System.out.println("Invalid Input!");
+                    }
+                }
+            }
+            // Closes the writer
+            bufferedWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
