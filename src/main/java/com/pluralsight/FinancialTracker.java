@@ -96,8 +96,8 @@ public class FinancialTracker {
                     List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\|")));
 
                     // Getting the tokens and putting them into the new variables
-                    String date = tokens.get(0);
-                    String time = tokens.get(1);
+                    LocalDate date = parseDate(tokens.get(0));
+                    LocalTime time = LocalTime.parse(tokens.get(1));
                     String description = tokens.get(2);
                     String vendor = tokens.get(3);
                     double amount = Double.parseDouble(tokens.get(4));
@@ -151,19 +151,28 @@ public class FinancialTracker {
 
             System.out.print("Amount (positive): ");
             double amount = scanner.nextDouble();
+            scanner.nextLine();
 
             // Checks if it is a positive number
                 if (amount > 0) {
-                    // Got the format for the date and then separated them into their own variables
-                    LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
-                    String date = String.valueOf(dateTimeFMT.toLocalDate());
-                    String time = String.valueOf(dateTimeFMT.toLocalTime());
+                    LocalDate date;
+                    LocalTime time;
+                    try {
+                        // Got the format for the date and then separated them into their own variables
+                        LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
+                        date = dateTimeFMT.toLocalDate();
+                        time = dateTimeFMT.toLocalTime();
+                    } catch (Exception e) {
+                        System.out.println("Wrong Date and Time!\n");
+                        continue;
+                    }
 
                     // Adds the object to the memory and then appends the variables into the file
                     transactions.add(new Transaction(date, time, description, vendor, amount));
-                    bufferedWriter.append(date).append("|").append(time).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
 
-                    System.out.print("Deposit recorded.");
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
+
+                    System.out.print("Deposit recorded.\n\n");
 
                     // Makes running true to close the while loop
                     running = true;
@@ -288,7 +297,13 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
     private static LocalDate parseDate(String s) {
         /* TODO – return LocalDate or null */
-        return null;
+
+        try {
+            LocalDate dateTime = LocalDate.parse(s, DATE_FMT);
+            return dateTime;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static Double parseDouble(String s) {
