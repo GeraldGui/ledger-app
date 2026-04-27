@@ -79,7 +79,7 @@ public class FinancialTracker {
 
         try {
             // Read the file with fileReader in the BufferReader
-            FileReader fileReader = new FileReader(FILE_NAME);
+            FileReader fileReader = new FileReader(fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             String line;
