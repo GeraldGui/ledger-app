@@ -91,12 +91,14 @@ public class FinancialTracker {
                 List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\|")));
 
                 // Getting the tokens and putting them into the new variables
+                String date = tokens.get(0);
+                String time = tokens.get(1);
                 String description = tokens.get(2);
                 String vendor = tokens.get(3);
                 double amount = Double.parseDouble(tokens.get(4));
 
                 // Creating the new objects for each line there is
-                transactions.add(new Transaction(description, vendor, amount));
+                transactions.add(new Transaction(date, time, description, vendor, amount));
             }
 
         } catch (IOException e) {
@@ -116,6 +118,19 @@ public class FinancialTracker {
      */
     private static void addDeposit(Scanner scanner) {
         // TODO
+        System.out.print("Date & time (yyyy-MM-dd- HH:mm:ss): ");
+        String dateTime = scanner.nextLine();
+
+        System.out.print("Description: ");
+        String description = scanner.nextLine();
+
+        System.out.print("Vendor: ");
+        String vendor = scanner.nextLine();
+
+        System.out.print("Amount (positive): ");
+        double amount = scanner.nextDouble();
+
+        System.out.print("Deposit recorded.");
     }
 
     /**
