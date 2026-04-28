@@ -44,7 +44,7 @@ public class FinancialTracker {
         boolean running = true;
 
         while (running) {
-            System.out.println("Welcome to TransactionApp");
+            System.out.println("\nWelcome to TransactionApp");
             System.out.println("Choose an option:");
             System.out.println("D) Add Deposit");
             System.out.println("P) Make Payment (Debit)");
@@ -170,7 +170,7 @@ public class FinancialTracker {
                     // Adds the object to the memory and then appends the variables into the file
                     transactions.add(new Transaction(date, time, description, vendor, amount));
 
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|$").append(String.valueOf(amount)).append("\n");
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
 
                     System.out.print("Deposit recorded.\n\n");
 
@@ -246,7 +246,7 @@ public class FinancialTracker {
                     // Adds the object to the memory and then appends the variables into the file
                     transactions.add(new Transaction(date, time, description, vendor, amount));
 
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|-$").append(String.valueOf(amount)).append("\n");
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|-").append(String.valueOf(amount)).append("\n");
 
                     System.out.print("Payment recorded.\n\n");
 
@@ -308,7 +308,11 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
     private static void displayLedger() {
         /* TODO – print all transactions in column format */
-
+        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        System.out.println("--------------------------------------------------------------------------------------" );
+        for (Transaction displayAll : transactions) {
+            System.out.println(displayAll);
+        }
 
     }
 
