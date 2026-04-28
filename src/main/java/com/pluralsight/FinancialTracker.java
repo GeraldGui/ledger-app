@@ -326,7 +326,16 @@ public class FinancialTracker {
         }
     }
 
-    private static void displayPayments() { /* TODO – only amount < 0               */ }
+    private static void displayPayments() {
+        /* TODO – only amount < 0               */
+        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        System.out.println("--------------------------------------------------------------------------------------" );
+        for (Transaction displayNegative : transactions) {
+            if (displayNegative.getAmount() < 0) {
+                System.out.println(displayNegative);
+            }
+        }
+    }
 
     /* ------------------------------------------------------------------
        Reports menu
