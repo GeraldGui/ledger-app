@@ -408,7 +408,20 @@ public class FinancialTracker {
                         }
                     }
                 }
-                case "5" -> {/* TODO – prompt for vendor then report */ }
+                case "5" -> {
+                    /* TODO – prompt for vendor then report */
+                    System.out.print("Vendor name: ");
+                    String userInput = scanner.nextLine();
+
+                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    System.out.println("--------------------------------------------------------------------------------------" );
+                    for (Transaction searchVendor : transactions) {
+                        // if statement that gets vendor data and then checks if that is equals to the userInput
+                        if (searchVendor.getVendor().equalsIgnoreCase(userInput)) {
+                            System.out.println(searchVendor);
+                        }
+                    }
+                }
                 case "6" -> customSearch(scanner);
                 case "0" -> running = false;
                 default -> System.out.println("Invalid option");
