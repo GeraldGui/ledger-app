@@ -170,7 +170,7 @@ public class FinancialTracker {
                     // Adds the object to the memory and then appends the variables into the file
                     transactions.add(new Transaction(date, time, description, vendor, amount));
 
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|$").append(String.valueOf(amount)).append("\n");
 
                     System.out.print("Deposit recorded.\n\n");
 
@@ -206,7 +206,74 @@ public class FinancialTracker {
      * then converted to a negative amount before storing.
      */
     private static void addPayment(Scanner scanner) {
-        // TODO
+        try {
+            // TODO
+            // Writes in the file, made sure to make it append in the file
+            FileWriter fileWriter = new FileWriter(FILE_NAME, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            boolean running = false;
+
+            // Loop will continue to run as long as it is true
+            while (!running) {
+                System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
+                String dateTime = scanner.nextLine();
+
+                System.out.print("Description: ");
+                String description = scanner.nextLine();
+
+                System.out.print("Vendor: ");
+                String vendor = scanner.nextLine();
+
+                System.out.print("Amount (positive): ");
+                double amount = scanner.nextDouble();
+                scanner.nextLine();
+
+                // Checks if it is a positive number
+                if (amount > 0) {
+                    LocalDate date;
+                    LocalTime time;
+                    try {
+                        // Got the format for the date and then separated them into their own variables
+                        LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
+                        date = dateTimeFMT.toLocalDate();
+                        time = dateTimeFMT.toLocalTime();
+                    } catch (Exception e) {
+                        System.out.println("Wrong Date and Time!\n");
+                        continue;
+                    }
+
+                    // Adds the object to the memory and then appends the variables into the file
+                    transactions.add(new Transaction(date, time, description, vendor, amount));
+
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|-$").append(String.valueOf(amount)).append("\n");
+
+                    System.out.print("Payment recorded.\n\n");
+
+                    // Makes running true to close the while loop
+                    running = true;
+                } else {
+                    System.out.println("Invalid Amount!");
+                    System.out.print("Would you like to try again? (Y/N): ");
+                    String stillContinue = scanner.nextLine();
+
+                    if (stillContinue.equalsIgnoreCase("y")) {
+                        System.out.println("Enter your info again.");
+                    } else if (stillContinue.equalsIgnoreCase("n")){
+                        System.out.println("Thank you, sending you back to Menu.");
+                        running = true;
+                    }
+                    else {
+                        System.out.println("Invalid Input!");
+                    }
+                }
+            }
+            // Closes the writer
+            bufferedWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /* ------------------------------------------------------------------
@@ -239,7 +306,11 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
-    private static void displayLedger() { /* TODO – print all transactions in column format */ }
+    private static void displayLedger() {
+        /* TODO – print all transactions in column format */
+
+
+    }
 
     private static void displayDeposits() { /* TODO – only amount > 0               */ }
 

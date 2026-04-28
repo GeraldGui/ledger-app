@@ -57,4 +57,13 @@ public class Transaction {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "Date\tTime\tDescription\tVendor\tAmount\n" +
+                "-----------------------------------------------------------------------\n" +
+                date + "  " + time + "  " + description + "  " + vendor + "  " + amount;
+    }
+
+
 }
