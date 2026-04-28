@@ -363,6 +363,7 @@ public class FinancialTracker {
                     System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction monthToDate : transactions) {
+                        // if statement checking for the data month is equal to today month and data year then equals to today year.
                         if (monthToDate.getDate().getMonth() == today.getMonth() && monthToDate.getDate().getYear() == today.getYear()) {
                             System.out.println(monthToDate);
                         }
@@ -375,14 +376,38 @@ public class FinancialTracker {
                     System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction previousMonth : transactions) {
+                        // if statement checking for the data month number is less than today month number
                         if (previousMonth.getDate().getMonthValue() < today.getMonthValue()) {
                             System.out.println(previousMonth);
                         }
                     }
-
                 }
-                case "3" -> {/* TODO – year-to-date report   */ }
-                case "4" -> {/* TODO – previous year report  */ }
+                case "3" -> {
+                    /* TODO – year-to-date report   */
+                    LocalDate today = LocalDate.now();
+
+                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    System.out.println("--------------------------------------------------------------------------------------" );
+                    for (Transaction yearToDate : transactions) {
+                        // if statement checking for the data year is equal to today year
+                        if (yearToDate.getDate().getYear() == today.getYear()) {
+                            System.out.println(yearToDate);
+                        }
+                    }
+                }
+                case "4" -> {
+                    /* TODO – previous year report  */
+                    LocalDate today = LocalDate.now();
+
+                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    System.out.println("--------------------------------------------------------------------------------------" );
+                    for (Transaction previousYear : transactions) {
+                        // if statement checking for the data year is less than today year
+                        if (previousYear.getDate().getYear() < today.getYear()) {
+                            System.out.println(previousYear);
+                        }
+                    }
+                }
                 case "5" -> {/* TODO – prompt for vendor then report */ }
                 case "6" -> customSearch(scanner);
                 case "0" -> running = false;
