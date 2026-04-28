@@ -443,6 +443,57 @@ public class FinancialTracker {
     private static void customSearch(Scanner scanner) {
         // TODO – prompt for any combination of date range, description,
         //        vendor, and exact amount, then display matches
+
+        System.out.print("Start date  (yyyy-MM-dd, blank = none): ");
+        String startDate = scanner.nextLine();
+
+        System.out.print("End date    (yyyy-MM-dd, blank = none): ");
+        String endDate = scanner.nextLine();
+
+        System.out.print("Description (blank = none): ");
+        String description = scanner.nextLine();
+
+        System.out.print("Vendor      (blank = none): ");
+        String vendor = scanner.nextLine();
+
+        System.out.print("Amount      (blank = none): ");
+        String amount = scanner.nextLine();
+
+        for (Transaction customSearch : transactions) {
+            // Stores all the data in the variables
+            LocalDate parseStartDate = parseDate(startDate);
+            LocalDate parseEndDate = parseDate(endDate);
+            String aboutDescription = customSearch.getDescription();
+            String whoIsVendor = customSearch.getVendor();
+            double money = customSearch.getAmount();
+
+            boolean matches = true;
+
+            // Checks if not blank and if data is not after userInput date
+            if (parseStartDate != null && !customSearch.getDate().isAfter(parseStartDate)) {
+                matches = false;
+            }
+            // Checks if not blank and if data is not before userInput date
+            if (parseEndDate != null && !customSearch.getDate().isBefore(parseEndDate)) {
+                matches = false;
+            }
+            // Checks if not empty and if data is not equal to userInput description
+            if (!description.isEmpty() && !aboutDescription.equalsIgnoreCase(description)) {
+                matches = false;
+            }
+            // Checks if not empty and if data is not equal to userInput vendor
+            if (!vendor.isEmpty() && !whoIsVendor.equalsIgnoreCase(vendor)) {
+                matches = false;
+            }
+            // Checks if not empty and if data is not equal to userInput amount
+            if (!amount.isEmpty() && money != Double.parseDouble(amount)) {
+                matches = false;
+            }
+            // Checks all that match then prints it out
+            if (matches) {
+                System.out.println(customSearch);
+            }
+        }
     }
 
     /* ------------------------------------------------------------------
@@ -450,7 +501,6 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
     private static LocalDate parseDate(String s) {
         /* TODO – return LocalDate or null */
-
         try {
             LocalDate dateTime = LocalDate.parse(s, DATE_FMT);
             return dateTime;
