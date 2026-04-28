@@ -313,10 +313,18 @@ public class FinancialTracker {
         for (Transaction displayAll : transactions) {
             System.out.println(displayAll);
         }
-
     }
 
-    private static void displayDeposits() { /* TODO – only amount > 0               */ }
+    private static void displayDeposits() {
+        /* TODO – only amount > 0               */
+        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        System.out.println("--------------------------------------------------------------------------------------" );
+        for (Transaction displayPositive : transactions) {
+            if (displayPositive.getAmount() > 0) {
+                System.out.println(displayPositive);
+            }
+        }
+    }
 
     private static void displayPayments() { /* TODO – only amount < 0               */ }
 
