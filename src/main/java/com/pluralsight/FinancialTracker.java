@@ -375,7 +375,7 @@ public class FinancialTracker {
                     System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction previousMonth : transactions) {
-                        if (previousMonth.getDate().getMonthValue() == today.getMonthValue() - 1) {
+                        if (previousMonth.getDate().getMonthValue() < today.getMonthValue()) {
                             System.out.println(previousMonth);
                         }
                     }
