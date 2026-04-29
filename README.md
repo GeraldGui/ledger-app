@@ -1,15 +1,34 @@
-# Project Title
+# Ledger App
 
 ## Description of the Project
 
-Briefly describe what this Java console application does. Mention its purpose and who the intended users are. Explain the main functionality and what problems it aims to solve.
+This is a personal finance tracker console application built in Java. It's intended for individuals who want to track their income and expenses through a simple command line interface.
+
+The main functionality includes adding deposits and payments, viewing a ledger of all transactions, and filtering or reporting on transactions by date range, vendor, description, and amount. All transactions are saved to a CSV file so data persists between sessions.
+
+The problem it solves is giving users a lightweight way to monitor their spending and income without needing a complex app or internet connection — just a simple organized record of where money is coming from and where it's going.
+
 
 ## User Stories
 
 List the user stories that guided the development of your application. Format these stories as: "As a [type of user], I want [some goal] so that [some reason]."
 
-- As a user, I want to be able to input my data, so that the application can process it accordingly.
-- As a user, I want to receive immediate feedback, so I can understand what to do next.
+- As a customer I would like to know my options to pick what to do so that I can make a decision in the menu.
+- As a customer I would like to deposit my money so that I can keep my money safe.
+- As a customer I would like to make a payment with my debit card so that it can be easy to pay.
+- As a customer I would like to see my ledger so that I can keep track of my history.
+- As a Customer I would like to Exit the Menu and Leave so that I can be on my way.
+- As a customer when I am in the Ledger I want to see all my entries so that I can pick how I would like to view them.
+- As a customer when I look at my Ledger I want to see All my entries so that I know everything that happen in my account.
+- As a customer when I look at my Ledger I want to see my Deposits so that I know what i deposit into the account.
+- As a customer I want to look at my Payments so that I can look at my payment history.
+- As a customer I want to be able to see my reports so that I may seem my options in the report menu.
+- As a customer I would like to go back to the home page so that I can pick another option.
+- As a customer I would like to search up my Reports by Time so that I can see when they were made.
+- As a customer I would like to search up by Vendor in my Reports so that I can find the Vendor quickly.
+- As a customer I would like to use a custom search so that I can find what I need fast.
+- As a customer I would like to go back to the Ledger page so that I can pick my options again.
+- As a Customer I would like to see my transactions from the newest date to the oldest, so that I may look in order
 
 ## Setup
 
@@ -32,7 +51,7 @@ Follow these steps to get your application running within IntelliJ IDEA:
 
 ## Technologies Used
 
-- Java: Mention the version you are using.
+- Java: corretto-17 Amazon Corretto 17.0.18
 - Any additional libraries or frameworks used in the project.
 
 ## Demo
@@ -52,18 +71,17 @@ Outline potential future enhancements or functionalities you might consider addi
 
 List resources such as tutorials, articles, or documentation that helped you during the project.
 
-- [Java Programming Tutorial](https://www.example.com)
-- [Effective Java](https://www.example.com)
+- [GitHub Resource](https://github.com/RayMaroun/yearup-spring-section-8-2026)
+- [Java Visual](https://raymaroun.github.io/yearup-java-visuals/)
 
 ## Team Members
 
-- **Name 1** - Specific contributions or roles.
-- **Name 2** - Specific contributions or roles.
+- **Gerald** - Owner
 
 ## Thanks
 
 Express gratitude towards those who provided help, guidance, or resources:
 
-- Thank you to [Mentor's Name] for continuous support and guidance.
-- A special thanks to all teammates for their dedication and teamwork.
+- Thank you to **Raymond** for continuous support and guidance.
+- A special thanks to all **Raymond** for their dedication to teaching.
  
