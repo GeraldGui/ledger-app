@@ -10,6 +10,11 @@ public class Transaction {
     private String vendor;
     private double amount;
 
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String BLUE = "\u001B[36m";
+    private static final String RESET = "\u001B[0m";
+
     public Transaction(LocalDate date, LocalTime time, String description, String vendor, double amount) {
         this.date = date;
         this.time = time;
@@ -60,8 +65,10 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,date, time, description, vendor, amount);
+        if (amount > 0) {
+            return String.format(BLUE + "%-10s" + RESET + "|" + BLUE + "%-10s" + RESET + "|" + BLUE + "%-30s" + RESET + "|" + BLUE + " %-20s" + RESET + "|" + GREEN + "%-6s" + RESET, date, time, description, vendor, amount);
+        } else {
+            return String.format(BLUE + "%-10s" + RESET + "|" + BLUE + "%-10s" + RESET + "|" + BLUE + "%-30s" + RESET + "|" + BLUE + " %-20s" + RESET + "|" + RED + "%-6s" + RESET, date, time, description, vendor, amount);
+        }
     }
-
-
 }

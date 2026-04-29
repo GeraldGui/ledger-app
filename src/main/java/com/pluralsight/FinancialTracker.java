@@ -31,6 +31,9 @@ public class FinancialTracker {
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern(TIME_PATTERN);
     private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
+    private static final String GOLD = "\u001B[1m\u001B[33m";
+    private static final String RESET = "\u001B[0m";
+
     /* ------------------------------------------------------------------
        Main menu
        ------------------------------------------------------------------ */
@@ -165,7 +168,7 @@ public class FinancialTracker {
                     }
 
                     // Adds the object to the memory and then appends the variables into the file
-                    transactions.add(new Transaction(date, time, description, vendor, amount));
+                    transactions.add(new Transaction(date, time, description, vendor,amount));
 
                     bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
 
@@ -307,7 +310,7 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
     private static void displayLedger() {
         /* TODO – print all transactions in column format */
-        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        title();
         System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayAll : transactions) {
             System.out.println(displayAll);
@@ -316,7 +319,7 @@ public class FinancialTracker {
 
     private static void displayDeposits() {
         /* TODO – only amount > 0               */
-        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        title();
         System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayPositive : transactions) {
             if (displayPositive.getAmount() > 0) {
@@ -327,7 +330,7 @@ public class FinancialTracker {
 
     private static void displayPayments() {
         /* TODO – only amount < 0               */
-        System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+        title();
         System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayNegative : transactions) {
             if (displayNegative.getAmount() < 0) {
@@ -359,7 +362,7 @@ public class FinancialTracker {
                     /* TODO – month-to-date report */
                     LocalDate today = LocalDate.now();
 
-                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    title();
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction monthToDate : transactions) {
                         // if statement checking for the data month is equal to today month and data year then equals to today year.
@@ -372,7 +375,7 @@ public class FinancialTracker {
                     /* TODO – previous month report */
                     LocalDate today = LocalDate.now();
 
-                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    title();
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction previousMonth : transactions) {
                         // if statement checking for the data month number is less than today month number
@@ -385,7 +388,7 @@ public class FinancialTracker {
                     /* TODO – year-to-date report   */
                     LocalDate today = LocalDate.now();
 
-                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    title();
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction yearToDate : transactions) {
                         // if statement checking for the data year is equal to today year
@@ -398,7 +401,7 @@ public class FinancialTracker {
                     /* TODO – previous year report  */
                     LocalDate today = LocalDate.now();
 
-                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    title();
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction previousYear : transactions) {
                         // if statement checking for the data year is less than today year
@@ -412,7 +415,7 @@ public class FinancialTracker {
                     System.out.print("Vendor name: ");
                     String userInput = scanner.nextLine();
 
-                    System.out.println(String.format("%-10s| %-10s| %-30s| %-20s| %-6s" ,"Date", "Time", "Description", "Vendor", "Amount"));
+                    title();
                     System.out.println("--------------------------------------------------------------------------------------" );
                     for (Transaction searchVendor : transactions) {
                         // if statement that gets vendor data and then checks if that is equals to the userInput
@@ -511,5 +514,9 @@ public class FinancialTracker {
     private static Double parseDouble(String s) {
         /* TODO – return Double   or null */
         return null;
+    }
+
+    private static void title(){
+        System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET ,"Date", "Time", "Description", "Vendor", "Amount"));
     }
 }
