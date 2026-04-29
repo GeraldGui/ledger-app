@@ -5,10 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /*
  * Capstone skeleton – personal finance tracker.
@@ -290,6 +287,8 @@ public class FinancialTracker {
             System.out.println("R) Reports");
             System.out.println("H) Home");
 
+            // Sort Transaction from the dates, newest to oldest by reversing it.
+            Collections.sort(transactions, Comparator.comparing(Transaction::getDate).reversed());
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
