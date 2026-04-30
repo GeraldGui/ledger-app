@@ -82,12 +82,12 @@ public class FinancialTracker {
                 // Use while loop to use line to read each line until there is no more to read
                 while ((line = bufferedReader.readLine()) != null) {
 
+                    if (line.isEmpty()) continue;
+
                     // Creates an array called tokens to then split the line from \\| then stores them into tokens
                     String[] tokens = line.split("\\|");
 
-                    if (line.isEmpty()) {
-                        continue;
-                    }
+                    if (tokens.length != 5) continue;
 
                     // Getting the tokens and putting them into the new variables
                     LocalDate date = parseDate(tokens[0]);
@@ -111,8 +111,7 @@ public class FinancialTracker {
 
             }
 
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("File not reading!");
         }
     }
@@ -122,185 +121,43 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
 
     private static void addDeposit(Scanner scanner) {
-        try {
-            boolean running = false;
+        String[] data = getTransactionsInput(scanner, false);
 
-            // Loop will continue to run as long as it is true
-            while (!running) {
-                String dateTime = "";
-                String description = "";
-                String vendor = "";
-                double amount = 0;
+        LocalDate date = parseDate(data[0]);
+        LocalTime time = LocalTime.parse(data[1]);
+        String description = data[2];
+        String vendor = data[3];
+        Double amount = parseDouble(data[4]);
 
-                boolean dateValid = false;
-                boolean descriptionValid = false;
-                boolean vendorValid = false;
-                boolean amountValid = false;
-
-                LocalDate date = null;
-                LocalTime time = null;
-
-
-                while (!dateValid) {
-                    System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
-                    dateTime = scanner.nextLine();
-
-                    try {
-                        // Got the format for the date and then separated them into their own variables
-                        LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
-                        date = dateTimeFMT.toLocalDate();
-                        time = dateTimeFMT.toLocalTime();
-                        dateValid = true;
-                    } catch (Exception e) {
-                        System.out.println("Wrong Date and Time!\n");
-                    }
-                }
-
-                while (!descriptionValid) {
-                    System.out.print("Description: ");
-                    description = scanner.nextLine();
-
-                    if (!description.isEmpty()) {
-                        descriptionValid = true;
-                    } else {
-                        System.out.println("Description cannot be empty!");
-                    }
-                }
-
-                while (!vendorValid) {
-                    System.out.print("Vendor: ");
-                    vendor = scanner.nextLine();
-
-                    if (!vendor.isEmpty()) {
-                        vendorValid = true;
-                    } else {
-                        System.out.println("Vendor cannot be empty!");
-                    }
-                }
-
-                while (!amountValid) {
-                    System.out.print("Amount (positive): ");
-                    amount = scanner.nextDouble();
-                    scanner.nextLine();
-
-                    if (amount > 0) {
-                        amountValid = true;
-                    } else {
-                        System.out.println("Amount Invalid!");
-                    }
-                }
-                    // Adds the object to the memory and then appends the variables into the file
-                    transactions.add(new Transaction(date, time, description, vendor,amount));
-
-                    // Writes in the file, made sure to make it append in the file
-                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true));
-
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.format("%.2f", amount)).append("\n");
-
-                    // Closes the writer
-                    bufferedWriter.close();
-
-                    System.out.print("Deposit recorded.\n");
-
-                    // Makes running true to close the while loop
-                    running = true;
-
-            }
-        } catch (IOException e) {
-            System.out.println("Wrong Input For Deposit!");
+        if (amount == null) {
+            System.out.println("Invalid amount.");
+            return;
         }
+
+        Transaction deposit = new Transaction(date, time, description, vendor, amount);
+        transactions.add(deposit);
+
+        saveTransactions(deposit);
     }
 
     private static void addPayment(Scanner scanner) {
-        try {
-            boolean running = false;
+        String[] data = getTransactionsInput(scanner, true);
 
-            // Loop will continue to run as long as it is true
-            while (!running) {
-                String dateTime = "";
-                String description = "";
-                String vendor = "";
-                double amount = 0;
+        LocalDate date = parseDate(data[0]);
+        LocalTime time = LocalTime.parse(data[1]);
+        String description = data[2];
+        String vendor = data[3];
+        Double amount = parseDouble(data[4]);
 
-                boolean dateValid = false;
-                boolean descriptionValid = false;
-                boolean vendorValid = false;
-                boolean amountValid = false;
-
-                LocalDate date = null;
-                LocalTime time = null;
-
-
-                while (!dateValid) {
-                    System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
-                    dateTime = scanner.nextLine();
-
-
-                    try {
-                        // Got the format for the date and then separated them into their own variables
-                        LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
-                        date = dateTimeFMT.toLocalDate();
-                        time = dateTimeFMT.toLocalTime();
-                        dateValid = true;
-                    } catch (Exception e) {
-                        System.out.println("Wrong Date and Time!\n");
-                    }
-                }
-
-                while (!descriptionValid) {
-                    System.out.print("Description: ");
-                    description = scanner.nextLine();
-
-                    if (!description.isEmpty()) {
-                        descriptionValid = true;
-                    } else {
-                        System.out.println("Description cannot be empty!");
-                    }
-                }
-
-                while (!vendorValid) {
-                    System.out.print("Vendor: ");
-                    vendor = scanner.nextLine();
-
-                    if (!vendor.isEmpty()) {
-                        vendorValid = true;
-                    } else {
-                        System.out.println("Vendor cannot be empty!");
-                    }
-                }
-
-                while (!amountValid) {
-                    System.out.print("Amount (positive): ");
-                    amount = scanner.nextDouble();
-                    scanner.nextLine();
-
-                    if (amount > 0) {
-                        amountValid = true;
-                        amount = -amount;
-                    } else {
-                        System.out.println("Amount Invalid!");
-                    }
-                }
-                // Adds the object to the memory and then appends the variables into the file
-                transactions.add(new Transaction(date, time, description, vendor,amount));
-
-                // Writes in the file, made sure to make it append in the file
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true));
-
-                bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.format("%.2f", amount)).append("\n");
-
-                // Closes the writer
-                bufferedWriter.close();
-
-                System.out.print("Payment recorded.\n");
-
-                // Makes running true to close the while loop
-                running = true;
-
-            }
-        } catch (IOException e) {
-            System.out.println("Wrong Input For Deposit!");
+        if (amount == null) {
+            System.out.println("Invalid amount.");
+            return;
         }
+
+        Transaction deposit = new Transaction(date, time, description, vendor, amount);
+        transactions.add(deposit);
+
+        saveTransactions(deposit);
     }
 
     /* ------------------------------------------------------------------
@@ -309,7 +166,7 @@ public class FinancialTracker {
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
-            System.out.println("Ledger");
+            System.out.println("\nLedger");
             System.out.println("Choose an option:");
             System.out.println("A) All");
             System.out.println("D) Deposits");
@@ -336,14 +193,14 @@ public class FinancialTracker {
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
     private static void displayLedger() {
-        title();
+        printLedgerHeader();
         for (Transaction displayAll : transactions) {
             System.out.println(displayAll);
         }
     }
 
     private static void displayDeposits() {
-        title();
+        printLedgerHeader();
         for (Transaction displayPositive : transactions) {
             if (displayPositive.getAmount() > 0) {
                 System.out.println(displayPositive);
@@ -352,7 +209,7 @@ public class FinancialTracker {
     }
 
     private static void displayPayments() {
-        title();
+        printLedgerHeader();
         for (Transaction displayNegative : transactions) {
             if (displayNegative.getAmount() < 0) {
                 System.out.println(displayNegative);
@@ -366,7 +223,7 @@ public class FinancialTracker {
     private static void reportsMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
-            System.out.println("Reports");
+            System.out.println("\nReports");
             System.out.println("Choose an option:");
             System.out.println("1) Month To Date");
             System.out.println("2) Previous Month");
@@ -385,7 +242,7 @@ public class FinancialTracker {
                     LocalDate start = today.withDayOfMonth(1);
                     LocalDate end = today;
 
-                    title();
+                    printLedgerHeader();
                     filterTransactionsByDate(start, end);
                 }
                 case "2" -> {
@@ -394,7 +251,7 @@ public class FinancialTracker {
                     LocalDate start = today.minusMonths(1).withDayOfMonth(1);
                     LocalDate end = today.withDayOfMonth(1).minusDays(1);
 
-                    title();
+                    printLedgerHeader();
                     filterTransactionsByDate(start, end);
                 }
                 case "3" -> {
@@ -403,7 +260,7 @@ public class FinancialTracker {
                     LocalDate start = today.withDayOfYear(1);
                     LocalDate end = today;
 
-                    title();
+                    printLedgerHeader();
                     filterTransactionsByDate(start, end);
                 }
                 case "4" -> {
@@ -412,14 +269,14 @@ public class FinancialTracker {
                     LocalDate start = today.minusYears(1).withDayOfYear(1);
                     LocalDate end = today.withDayOfYear(1).minusDays(1);
 
-                    title();
+                    printLedgerHeader();
                     filterTransactionsByDate(start, end);
                 }
                 case "5" -> {
                     System.out.print("Vendor name: ");
                     String userInput = scanner.nextLine();
 
-                    title();
+                    printLedgerHeader();
                     filterTransactionsByVendor(userInput);
 
                 }
@@ -468,7 +325,7 @@ public class FinancialTracker {
         System.out.print("Amount      (blank = none): ");
         String amount = scanner.nextLine();
 
-        title();
+        printLedgerHeader();
 
         LocalDate parseStartDate = parseDate(startDate);
         LocalDate parseEndDate = parseDate(endDate);
@@ -520,6 +377,7 @@ public class FinancialTracker {
         }
     }
 
+
     private static Double parseDouble(String s) {
         try {
             return Double.parseDouble(s);
@@ -528,8 +386,69 @@ public class FinancialTracker {
         }
     }
 
-    private static void title(){
-        System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET ,"Date", "Time", "Description", "Vendor", "Amount"));
-        System.out.println("--------------------------------------------------------------------------------------" );
+    private static void printLedgerHeader() {
+        System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET, "Date", "Time", "Description", "Vendor", "Amount"));
+        System.out.println("--------------------------------------------------------------------------------------");
+    }
+
+    private static String[] getTransactionsInput(Scanner scanner, boolean inputAmount) {
+        String dateTime;
+        String description;
+        String vendor;
+        double amount;
+
+        LocalDate date;
+        LocalTime time;
+
+        while (true) {
+            System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
+            dateTime = scanner.nextLine();
+
+
+            try {
+                // Got the format for the date and then separated them into their own variables
+                LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
+                date = dateTimeFMT.toLocalDate();
+                time = dateTimeFMT.toLocalTime();
+                break;
+            } catch (Exception e) {
+                System.out.println("Wrong Date and Time!\n");
+            }
+        }
+        do {
+            System.out.print("Description: ");
+            description = scanner.nextLine();
+        } while (description.isEmpty());
+
+        do {
+            System.out.println("Vendor: ");
+            vendor = scanner.nextLine();
+        } while (vendor.isEmpty());
+
+        while (true) {
+            System.out.println("Amount (positive): ");
+            amount = scanner.nextDouble();
+            scanner.nextLine();
+
+            if (amount > 0) {
+                break;
+            } else {
+                System.out.println("Invalid amount");
+            }
+        }
+        if (inputAmount) {
+            amount = -amount;
+        }
+        return new String[]{date.toString(), time.toString(), description, vendor, String.valueOf(amount)};
+    }
+
+    private static void saveTransactions(Transaction saveObject) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
+            bufferedWriter.write(saveObject.getDate() + "|" + saveObject.getTime() + "|" + saveObject.getDescription() + "|" + saveObject.getVendor() + "|"
+            + saveObject.getAmount());
+            bufferedWriter.newLine();
+        } catch (Exception e) {
+            System.out.println("Couldn't save transaction!");
+        }
     }
 }
