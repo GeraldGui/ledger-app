@@ -56,7 +56,7 @@ Follow these steps to get your application running within IntelliJ IDEA:
 
 ## Demo
 
-![Financial Tracker Demo](Demo.mp4)
+![Financial Tracker](/Demo.gif)
 
 ## Future Work
 
