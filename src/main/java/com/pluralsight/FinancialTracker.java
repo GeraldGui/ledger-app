@@ -68,24 +68,14 @@ public class FinancialTracker {
        File I/O
        ------------------------------------------------------------------ */
 
-    /**
-     * Load transactions from FILE_NAME.
-     * • If the file doesn’t exist, create an empty one so that future writes succeed.
-     * • Each line looks like: date|time|description|vendor|amount
-     */
     public static void loadTransactions(String fileName) {
-        // TODO: create file if it does not exist, then read each line,
-        //       parse the five fields, build a Transaction object,
-        //       and add it to the transactions list.
-
         try {
             // Checks if the file exist
             File fileExist = new File(fileName);
 
             if (fileExist.exists()) {
                 // Read the file with fileReader in the BufferReader
-                FileReader fileReader = new FileReader(fileName);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
 
                 String line;
 
@@ -93,17 +83,25 @@ public class FinancialTracker {
                 while ((line = bufferedReader.readLine()) != null) {
 
                     // Creates an array called tokens to then split the line from \\| then stores them into tokens
-                    List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\|")));
+                    String[] tokens = line.split("\\|");
+
+                    if (line.isEmpty()) {
+                        continue;
+                    }
 
                     // Getting the tokens and putting them into the new variables
-                    LocalDate date = parseDate(tokens.get(0));
-                    LocalTime time = LocalTime.parse(tokens.get(1));
-                    String description = tokens.get(2);
-                    String vendor = tokens.get(3);
-                    double amount = Double.parseDouble(tokens.get(4));
+                    LocalDate date = parseDate(tokens[0]);
+                    LocalTime time = LocalTime.parse(tokens[1], TIME_FMT);
+                    String description = tokens[2];
+                    String vendor = tokens[3];
+                    Double amount = parseDouble(tokens[4]);
 
                     // Creating the new objects for each line there is
-                    transactions.add(new Transaction(date, time, description, vendor, amount));
+                    if (date != null && amount != null) {
+                        transactions.add(new Transaction(date, time, description, vendor, amount));
+                    } else {
+                        System.out.println("Skipping invalid transaction.");
+                    }
                 }
                 // Closes the writer
                 bufferedReader.close();
@@ -115,7 +113,7 @@ public class FinancialTracker {
 
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("File not reading!");
         }
     }
 
@@ -123,157 +121,186 @@ public class FinancialTracker {
        Add new transactions
        ------------------------------------------------------------------ */
 
-    /**
-     * Prompt for ONE date+time string in the format
-     * "yyyy-MM-dd HH:mm:ss", plus description, vendor, amount.
-     * Validate that the amount entered is positive.
-     * Store the amount as-is (positive) and append to the file.
-     */
     private static void addDeposit(Scanner scanner) {
         try {
-            // TODO
-            // Writes in the file, made sure to make it append in the file
-            FileWriter fileWriter = new FileWriter(FILE_NAME, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
             boolean running = false;
 
             // Loop will continue to run as long as it is true
             while (!running) {
-            System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
-            String dateTime = scanner.nextLine();
+                String dateTime = "";
+                String description = "";
+                String vendor = "";
+                double amount = 0;
 
-            System.out.print("Description: ");
-            String description = scanner.nextLine();
+                boolean dateValid = false;
+                boolean descriptionValid = false;
+                boolean vendorValid = false;
+                boolean amountValid = false;
 
-            System.out.print("Vendor: ");
-            String vendor = scanner.nextLine();
+                LocalDate date = null;
+                LocalTime time = null;
 
-            System.out.print("Amount (positive): ");
-            double amount = scanner.nextDouble();
-            scanner.nextLine();
 
-            // Checks if it is a positive number
-                if (amount > 0) {
-                    LocalDate date;
-                    LocalTime time;
+                while (!dateValid) {
+                    System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
+                    dateTime = scanner.nextLine();
+
                     try {
                         // Got the format for the date and then separated them into their own variables
                         LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
                         date = dateTimeFMT.toLocalDate();
                         time = dateTimeFMT.toLocalTime();
+                        dateValid = true;
                     } catch (Exception e) {
                         System.out.println("Wrong Date and Time!\n");
-                        continue;
                     }
+                }
 
+                while (!descriptionValid) {
+                    System.out.print("Description: ");
+                    description = scanner.nextLine();
+
+                    if (!description.isEmpty()) {
+                        descriptionValid = true;
+                    } else {
+                        System.out.println("Description cannot be empty!");
+                    }
+                }
+
+                while (!vendorValid) {
+                    System.out.print("Vendor: ");
+                    vendor = scanner.nextLine();
+
+                    if (!vendor.isEmpty()) {
+                        vendorValid = true;
+                    } else {
+                        System.out.println("Vendor cannot be empty!");
+                    }
+                }
+
+                while (!amountValid) {
+                    System.out.print("Amount (positive): ");
+                    amount = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    if (amount > 0) {
+                        amountValid = true;
+                    } else {
+                        System.out.println("Amount Invalid!");
+                    }
+                }
                     // Adds the object to the memory and then appends the variables into the file
                     transactions.add(new Transaction(date, time, description, vendor,amount));
 
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.valueOf(amount)).append("\n");
+                    // Writes in the file, made sure to make it append in the file
+                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true));
 
-                    System.out.print("Deposit recorded.\n\n");
+                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.format("%.2f", amount)).append("\n");
+
+                    // Closes the writer
+                    bufferedWriter.close();
+
+                    System.out.print("Deposit recorded.\n");
 
                     // Makes running true to close the while loop
                     running = true;
-                } else {
-                    System.out.println("Invalid Amount!");
-                    System.out.print("Would you like to try again? (Y/N): ");
-                    String stillContinue = scanner.nextLine();
 
-                    if (stillContinue.equalsIgnoreCase("y")) {
-                        System.out.println("Enter your info again.");
-                    } else if (stillContinue.equalsIgnoreCase("n")){
-                        System.out.println("Thank you, sending you back to Menu.");
-                        running = true;
-                    }
-                    else {
-                        System.out.println("Invalid Input!");
-                    }
-                }
             }
-            // Closes the writer
-            bufferedWriter.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Wrong Input For Deposit!");
         }
-
     }
 
-    /**
-     * Same prompts as addDeposit.
-     * Amount must be entered as a positive number,
-     * then converted to a negative amount before storing.
-     */
     private static void addPayment(Scanner scanner) {
         try {
-            // TODO
-            // Writes in the file, made sure to make it append in the file
-            FileWriter fileWriter = new FileWriter(FILE_NAME, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
             boolean running = false;
 
             // Loop will continue to run as long as it is true
             while (!running) {
-                System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
-                String dateTime = scanner.nextLine();
+                String dateTime = "";
+                String description = "";
+                String vendor = "";
+                double amount = 0;
 
-                System.out.print("Description: ");
-                String description = scanner.nextLine();
+                boolean dateValid = false;
+                boolean descriptionValid = false;
+                boolean vendorValid = false;
+                boolean amountValid = false;
 
-                System.out.print("Vendor: ");
-                String vendor = scanner.nextLine();
+                LocalDate date = null;
+                LocalTime time = null;
 
-                System.out.print("Amount (positive): ");
-                double amount = scanner.nextDouble();
-                scanner.nextLine();
 
-                // Checks if it is a positive number
-                if (amount > 0) {
-                    LocalDate date;
-                    LocalTime time;
+                while (!dateValid) {
+                    System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
+                    dateTime = scanner.nextLine();
+
+
                     try {
                         // Got the format for the date and then separated them into their own variables
                         LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
                         date = dateTimeFMT.toLocalDate();
                         time = dateTimeFMT.toLocalTime();
+                        dateValid = true;
                     } catch (Exception e) {
                         System.out.println("Wrong Date and Time!\n");
-                        continue;
-                    }
-
-                    // Adds the object to the memory and then appends the variables into the file
-                    transactions.add(new Transaction(date, time, description, vendor, amount));
-
-                    bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|-").append(String.valueOf(amount)).append("\n");
-
-                    System.out.print("Payment recorded.\n\n");
-
-                    // Makes running true to close the while loop
-                    running = true;
-                } else {
-                    System.out.println("Invalid Amount!");
-                    System.out.print("Would you like to try again? (Y/N): ");
-                    String stillContinue = scanner.nextLine();
-
-                    if (stillContinue.equalsIgnoreCase("y")) {
-                        System.out.println("Enter your info again.");
-                    } else if (stillContinue.equalsIgnoreCase("n")){
-                        System.out.println("Thank you, sending you back to Menu.");
-                        running = true;
-                    }
-                    else {
-                        System.out.println("Invalid Input!");
                     }
                 }
-            }
-            // Closes the writer
-            bufferedWriter.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
+                while (!descriptionValid) {
+                    System.out.print("Description: ");
+                    description = scanner.nextLine();
+
+                    if (!description.isEmpty()) {
+                        descriptionValid = true;
+                    } else {
+                        System.out.println("Description cannot be empty!");
+                    }
+                }
+
+                while (!vendorValid) {
+                    System.out.print("Vendor: ");
+                    vendor = scanner.nextLine();
+
+                    if (!vendor.isEmpty()) {
+                        vendorValid = true;
+                    } else {
+                        System.out.println("Vendor cannot be empty!");
+                    }
+                }
+
+                while (!amountValid) {
+                    System.out.print("Amount (positive): ");
+                    amount = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    if (amount > 0) {
+                        amountValid = true;
+                        amount = -amount;
+                    } else {
+                        System.out.println("Amount Invalid!");
+                    }
+                }
+                // Adds the object to the memory and then appends the variables into the file
+                transactions.add(new Transaction(date, time, description, vendor,amount));
+
+                // Writes in the file, made sure to make it append in the file
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true));
+
+                bufferedWriter.append(DATE_FMT.format(date)).append("|").append(TIME_FMT.format(time)).append("|").append(description).append("|").append(vendor).append("|").append(String.format("%.2f", amount)).append("\n");
+
+                // Closes the writer
+                bufferedWriter.close();
+
+                System.out.print("Payment recorded.\n");
+
+                // Makes running true to close the while loop
+                running = true;
+
+            }
+        } catch (IOException e) {
+            System.out.println("Wrong Input For Deposit!");
+        }
     }
 
     /* ------------------------------------------------------------------
@@ -291,7 +318,7 @@ public class FinancialTracker {
             System.out.println("H) Home");
 
             // Sort Transaction from the dates, newest to oldest by reversing it.
-            Collections.sort(transactions, Comparator.comparing(Transaction::getDate).reversed());
+            Collections.sort(transactions, Comparator.comparing(Transaction::getDate).thenComparing(Transaction::getTime).reversed());
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
@@ -309,18 +336,14 @@ public class FinancialTracker {
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
     private static void displayLedger() {
-        /* TODO – print all transactions in column format */
         title();
-        System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayAll : transactions) {
             System.out.println(displayAll);
         }
     }
 
     private static void displayDeposits() {
-        /* TODO – only amount > 0               */
         title();
-        System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayPositive : transactions) {
             if (displayPositive.getAmount() > 0) {
                 System.out.println(displayPositive);
@@ -329,9 +352,7 @@ public class FinancialTracker {
     }
 
     private static void displayPayments() {
-        /* TODO – only amount < 0               */
         title();
-        System.out.println("--------------------------------------------------------------------------------------" );
         for (Transaction displayNegative : transactions) {
             if (displayNegative.getAmount() < 0) {
                 System.out.println(displayNegative);
@@ -356,73 +377,51 @@ public class FinancialTracker {
             System.out.println("0) Back");
 
             String input = scanner.nextLine().trim();
+            LocalDate today = LocalDate.now();
 
             switch (input) {
                 case "1" -> {
-                    /* TODO – month-to-date report */
-                    LocalDate today = LocalDate.now();
+                    // Month to Date
+                    LocalDate start = today.withDayOfMonth(1);
+                    LocalDate end = today;
 
                     title();
-                    System.out.println("--------------------------------------------------------------------------------------" );
-                    for (Transaction monthToDate : transactions) {
-                        // if statement checking for the data month is equal to today month and data year then equals to today year.
-                        if (monthToDate.getDate().getMonth() == today.getMonth() && monthToDate.getDate().getYear() == today.getYear()) {
-                            System.out.println(monthToDate);
-                        }
-                    }
+                    filterTransactionsByDate(start, end);
                 }
                 case "2" -> {
-                    /* TODO – previous month report */
-                    LocalDate today = LocalDate.now();
+
+                    // Previous Month
+                    LocalDate start = today.minusMonths(1).withDayOfMonth(1);
+                    LocalDate end = today.withDayOfMonth(1).minusDays(1);
 
                     title();
-                    System.out.println("--------------------------------------------------------------------------------------" );
-                    for (Transaction previousMonth : transactions) {
-                        // if statement checking for the data month number is less than today month number
-                        if (previousMonth.getDate().getMonthValue() < today.getMonthValue()) {
-                            System.out.println(previousMonth);
-                        }
-                    }
+                    filterTransactionsByDate(start, end);
                 }
                 case "3" -> {
-                    /* TODO – year-to-date report   */
-                    LocalDate today = LocalDate.now();
+
+                    // Year to Date
+                    LocalDate start = today.withDayOfYear(1);
+                    LocalDate end = today;
 
                     title();
-                    System.out.println("--------------------------------------------------------------------------------------" );
-                    for (Transaction yearToDate : transactions) {
-                        // if statement checking for the data year is equal to today year
-                        if (yearToDate.getDate().getYear() == today.getYear()) {
-                            System.out.println(yearToDate);
-                        }
-                    }
+                    filterTransactionsByDate(start, end);
                 }
                 case "4" -> {
-                    /* TODO – previous year report  */
-                    LocalDate today = LocalDate.now();
+
+                    // Previous Year
+                    LocalDate start = today.minusYears(1).withDayOfYear(1);
+                    LocalDate end = today.withDayOfYear(1).minusDays(1);
 
                     title();
-                    System.out.println("--------------------------------------------------------------------------------------" );
-                    for (Transaction previousYear : transactions) {
-                        // if statement checking for the data year is less than today year
-                        if (previousYear.getDate().getYear() < today.getYear()) {
-                            System.out.println(previousYear);
-                        }
-                    }
+                    filterTransactionsByDate(start, end);
                 }
                 case "5" -> {
-                    /* TODO – prompt for vendor then report */
                     System.out.print("Vendor name: ");
                     String userInput = scanner.nextLine();
 
                     title();
-                    System.out.println("--------------------------------------------------------------------------------------" );
-                    for (Transaction searchVendor : transactions) {
-                        // if statement that gets vendor data and then checks if that is equals to the userInput
-                        if (searchVendor.getVendor().equalsIgnoreCase(userInput)) {
-                            System.out.println(searchVendor);
-                        }
-                    }
+                    filterTransactionsByVendor(userInput);
+
                 }
                 case "6" -> customSearch(scanner);
                 case "0" -> running = false;
@@ -435,16 +434,24 @@ public class FinancialTracker {
        Reporting helpers
        ------------------------------------------------------------------ */
     private static void filterTransactionsByDate(LocalDate start, LocalDate end) {
-        // TODO – iterate transactions, print those within the range
+        for (Transaction monthToDate : transactions) {
+            if (!monthToDate.getDate().isBefore(start) && !monthToDate.getDate().isAfter(end)) {
+                System.out.println(monthToDate);
+            }
+        }
+
     }
 
     private static void filterTransactionsByVendor(String vendor) {
-        // TODO – iterate transactions, print those with matching vendor
+        for (Transaction searchVendor : transactions) {
+            // if statement that gets vendor data and then checks if that is equals to the userInput
+            if (searchVendor.getVendor().equalsIgnoreCase(vendor)) {
+                System.out.println(searchVendor);
+            }
+        }
     }
 
     private static void customSearch(Scanner scanner) {
-        // TODO – prompt for any combination of date range, description,
-        //        vendor, and exact amount, then display matches
 
         System.out.print("Start date  (yyyy-MM-dd, blank = none): ");
         String startDate = scanner.nextLine();
@@ -461,22 +468,25 @@ public class FinancialTracker {
         System.out.print("Amount      (blank = none): ");
         String amount = scanner.nextLine();
 
+        title();
+
+        LocalDate parseStartDate = parseDate(startDate);
+        LocalDate parseEndDate = parseDate(endDate);
+
         for (Transaction customSearch : transactions) {
             // Stores all the data in the variables
-            LocalDate parseStartDate = parseDate(startDate);
-            LocalDate parseEndDate = parseDate(endDate);
             String aboutDescription = customSearch.getDescription();
             String whoIsVendor = customSearch.getVendor();
             double money = customSearch.getAmount();
 
             boolean matches = true;
 
-            // Checks if not blank and if data is not after userInput date
-            if (parseStartDate != null && !customSearch.getDate().isAfter(parseStartDate)) {
+            // Checks if not blank and if data is before userInput date
+            if (parseStartDate != null && customSearch.getDate().isBefore(parseStartDate)) {
                 matches = false;
             }
-            // Checks if not blank and if data is not before userInput date
-            if (parseEndDate != null && !customSearch.getDate().isBefore(parseEndDate)) {
+            // Checks if not blank and if data is after userInput date
+            if (parseEndDate != null && customSearch.getDate().isAfter(parseEndDate)) {
                 matches = false;
             }
             // Checks if not empty and if data is not equal to userInput description
@@ -487,8 +497,8 @@ public class FinancialTracker {
             if (!vendor.isEmpty() && !whoIsVendor.equalsIgnoreCase(vendor)) {
                 matches = false;
             }
-            // Checks if not empty and if data is not equal to userInput amount
-            if (!amount.isEmpty() && money != Double.parseDouble(amount)) {
+            // Checks if not empty and amount is the same
+            if (!amount.isEmpty() && Math.abs(money - Double.parseDouble(amount)) > 0.001) {
                 matches = false;
             }
             // Checks all that match then prints it out
@@ -502,7 +512,6 @@ public class FinancialTracker {
        Utility parsers (you can reuse in many places)
        ------------------------------------------------------------------ */
     private static LocalDate parseDate(String s) {
-        /* TODO – return LocalDate or null */
         try {
             LocalDate dateTime = LocalDate.parse(s, DATE_FMT);
             return dateTime;
@@ -512,11 +521,15 @@ public class FinancialTracker {
     }
 
     private static Double parseDouble(String s) {
-        /* TODO – return Double   or null */
-        return null;
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private static void title(){
         System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET ,"Date", "Time", "Description", "Vendor", "Amount"));
+        System.out.println("--------------------------------------------------------------------------------------" );
     }
 }

@@ -20,7 +20,7 @@ List the user stories that guided the development of your application. Format th
 - As a Customer I would like to Exit the Menu and Leave so that I can be on my way.
 - As a customer when I am in the Ledger I want to see all my entries so that I can pick how I would like to view them.
 - As a customer when I look at my Ledger I want to see All my entries so that I know everything that happen in my account.
-- As a customer when I look at my Ledger I want to see my Deposits so that I know what i deposit into the account.
+- As a customer when I look at my Ledger I want to see my Deposits so that I know what I deposit into the account.
 - As a customer I want to look at my Payments so that I can look at my payment history.
 - As a customer I want to be able to see my reports so that I may seem my options in the report menu.
 - As a customer I would like to go back to the home page so that I can pick another option.
