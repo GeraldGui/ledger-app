@@ -39,6 +39,11 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Main menu
        ------------------------------------------------------------------ */
+
+    /**
+     * Entry point of the application, loads existing transactions.
+     * Displays welcome screen, and runs the main menu loop until the user exits.
+     */
     public static void main(String[] args) {
         loadTransactions(FILE_NAME);
 
@@ -72,6 +77,10 @@ public class FinancialTracker {
        File I/O
        ------------------------------------------------------------------ */
 
+    /**
+     * Checks if file exist, if not creates a new one.
+     * Reads the file then splits it to store in their own variable then creates an object
+     */
     public static void loadTransactions(String fileName) {
         try {
             // Checks if the file exist
@@ -124,6 +133,10 @@ public class FinancialTracker {
        Add new transactions
        ------------------------------------------------------------------ */
 
+    /**
+     * Loads getTransactionsInput method into a new variable and adds the deposit
+     * into the file and array then prints Deposit recorded!
+     */
     private static void addDeposit(Scanner scanner) {
         Transaction deposit = getTransactionsInput(scanner, false);
 
@@ -133,6 +146,10 @@ public class FinancialTracker {
         System.out.println("Deposit recorded!");
     }
 
+    /**
+     * Loads getTransactionsInput method into a new variable and adds the deposit
+     * into the file and array then prints Payment recorded!
+     */
     private static void addPayment(Scanner scanner) {
         Transaction payment = getTransactionsInput(scanner, true);
 
@@ -145,6 +162,11 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Ledger menu
        ------------------------------------------------------------------ */
+
+    /**
+     * Ask user options to see Ledger or go into Reports or Home.
+     * With switch cases.
+     */
     private static void ledgerMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
@@ -172,6 +194,10 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
+
+    /**
+     * Prints all the transactions from the file.
+     */
     private static void displayLedger() {
         printLedgerHeaderAndSort();
         for (Transaction displayAll : transactions) {
@@ -179,6 +205,9 @@ public class FinancialTracker {
         }
     }
 
+    /**
+     * Prints the user all the deposits by grabbing the positive from the file.
+     */
     private static void displayDeposits() {
         printLedgerHeaderAndSort();
         for (Transaction displayPositive : transactions) {
@@ -188,6 +217,9 @@ public class FinancialTracker {
         }
     }
 
+    /**
+     * Prints the user all the payments by grabbing the negative from the file.
+     */
     private static void displayPayments() {
         printLedgerHeaderAndSort();
         for (Transaction displayNegative : transactions) {
@@ -200,6 +232,12 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Reports menu
        ------------------------------------------------------------------ */
+
+    /**
+     * Runs the reports menu loop until the user goes back.
+     * Displays welcome screen, and runs the main menu loop until the user exits.
+     * Prompts the user for with already made prompts for searching in the file.
+     */
     private static void reportsMenu(Scanner scanner) {
         boolean running = true;
         while (running) {
@@ -270,6 +308,10 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Reporting helpers
        ------------------------------------------------------------------ */
+
+    /**
+     * Filter the dates by using the user input.
+     */
     private static void filterTransactionsByDate(LocalDate start, LocalDate end) {
         for (Transaction monthToDate : transactions) {
             if (!monthToDate.getDate().isBefore(start) && !monthToDate.getDate().isAfter(end)) {
@@ -279,6 +321,9 @@ public class FinancialTracker {
 
     }
 
+    /**
+     * Filters vendors in the file from user input.
+     */
     private static void filterTransactionsByVendor(String vendor) {
         for (Transaction searchVendor : transactions) {
             // if statement that gets vendor data and then checks if that is equals to the userInput
@@ -288,6 +333,10 @@ public class FinancialTracker {
         }
     }
 
+    /**
+     * Grabs the user input to search the file with the information the user provided
+     * by checking each filter.
+     */
     private static void customSearch(Scanner scanner) {
 
         System.out.print("Start date  (yyyy-MM-dd, blank = none): ");
@@ -349,6 +398,10 @@ public class FinancialTracker {
     /* ------------------------------------------------------------------
        Utility parsers (you can reuse in many places)
        ------------------------------------------------------------------ */
+
+    /**
+     * Parse LocalDate and returns it, if not return null.
+     */
     private static LocalDate parseDate(String s) {
         try {
             LocalDate dateTime = LocalDate.parse(s, DATE_FMT);
@@ -358,7 +411,9 @@ public class FinancialTracker {
         }
     }
 
-
+    /**
+     * Parse Double and returns it, if not return null.
+     */
     private static Double parseDouble(String s) {
         try {
             return Double.parseDouble(s);
@@ -367,6 +422,9 @@ public class FinancialTracker {
         }
     }
 
+    /**
+     * Prints out ledger header with calculated space and sorts out file from the most recent date and time.
+     */
     private static void printLedgerHeaderAndSort() {
         System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET, "Date", "Time", "Description", "Vendor", "Amount"));
         System.out.println("--------------------------------------------------------------------------------------");
@@ -375,6 +433,9 @@ public class FinancialTracker {
         Collections.sort(transactions, Comparator.comparing(Transaction::getDate).thenComparing(Transaction::getTime).reversed());
     }
 
+    /**
+     * Gets user input for transactions.
+     */
     private static Transaction getTransactionsInput(Scanner scanner, boolean inputAmount) {
         LocalDate date;
         LocalTime time;
@@ -424,6 +485,9 @@ public class FinancialTracker {
         return new Transaction(date, time, description, vendor, amount);
     }
 
+    /**
+     * Saves transactions in file.
+     */
     private static void saveTransactions(Transaction saveObject) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             bufferedWriter.write(saveObject.getDate() + "|" + saveObject.getTime() + "|" + saveObject.getDescription() + "|" + saveObject.getVendor() + "|"
@@ -434,6 +498,9 @@ public class FinancialTracker {
         }
     }
 
+    /**
+     * Provides Welcome Screen when app is launched.
+     */
     private static void welcomeScreen() {
         System.out.println(GOLD + "  +------------------------------------------------------------------+");
         System.out.println(GOLD + "  |                                                                  |");
