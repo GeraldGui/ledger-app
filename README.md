@@ -52,7 +52,6 @@ Follow these steps to get your application running within IntelliJ IDEA:
 ## Technologies Used
 
 - Java: corretto-17 Amazon Corretto 17.0.18
-- Any additional libraries or frameworks used in the project.
 
 ## Demo
 
@@ -61,10 +60,12 @@ Follow these steps to get your application running within IntelliJ IDEA:
 ## Future Work
 
 - Make an option for user to use front-end or the console
+- Let the user put a budget limit
+- Add a budget limit feature that warns the user when they are close to their spending limit
+- Add the ability to export reports to a PDF or Excel file
+- Add a summary dashboard that shows total deposits, total payment, and current balance
 
 ## Resources
-
-List resources such as tutorials, articles, or documentation that helped you during the project.
 
 - [GitHub Resource](https://github.com/RayMaroun/yearup-spring-section-8-2026)
 - [Java Visual](https://raymaroun.github.io/yearup-java-visuals/)

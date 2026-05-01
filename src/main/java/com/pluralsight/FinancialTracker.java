@@ -121,43 +121,21 @@ public class FinancialTracker {
        ------------------------------------------------------------------ */
 
     private static void addDeposit(Scanner scanner) {
-        String[] data = getTransactionsInput(scanner, false);
+        Transaction deposit = getTransactionsInput(scanner, false);
 
-        LocalDate date = parseDate(data[0]);
-        LocalTime time = LocalTime.parse(data[1]);
-        String description = data[2];
-        String vendor = data[3];
-        Double amount = parseDouble(data[4]);
-
-        if (amount == null) {
-            System.out.println("Invalid amount.");
-            return;
-        }
-
-        Transaction deposit = new Transaction(date, time, description, vendor, amount);
         transactions.add(deposit);
-
         saveTransactions(deposit);
+
+        System.out.println("Deposit recorded!");
     }
 
     private static void addPayment(Scanner scanner) {
-        String[] data = getTransactionsInput(scanner, true);
+        Transaction payment = getTransactionsInput(scanner, true);
 
-        LocalDate date = parseDate(data[0]);
-        LocalTime time = LocalTime.parse(data[1]);
-        String description = data[2];
-        String vendor = data[3];
-        Double amount = parseDouble(data[4]);
+        transactions.add(payment);
+        saveTransactions(payment);
 
-        if (amount == null) {
-            System.out.println("Invalid amount.");
-            return;
-        }
-
-        Transaction deposit = new Transaction(date, time, description, vendor, amount);
-        transactions.add(deposit);
-
-        saveTransactions(deposit);
+        System.out.println("Payment recorded!");
     }
 
     /* ------------------------------------------------------------------
@@ -174,8 +152,6 @@ public class FinancialTracker {
             System.out.println("R) Reports");
             System.out.println("H) Home");
 
-            // Sort Transaction from the dates, newest to oldest by reversing it.
-            Collections.sort(transactions, Comparator.comparing(Transaction::getDate).thenComparing(Transaction::getTime).reversed());
             String input = scanner.nextLine().trim();
 
             switch (input.toUpperCase()) {
@@ -193,14 +169,14 @@ public class FinancialTracker {
        Display helpers: show data in neat columns
        ------------------------------------------------------------------ */
     private static void displayLedger() {
-        printLedgerHeader();
+        printLedgerHeaderAndSort();
         for (Transaction displayAll : transactions) {
             System.out.println(displayAll);
         }
     }
 
     private static void displayDeposits() {
-        printLedgerHeader();
+        printLedgerHeaderAndSort();
         for (Transaction displayPositive : transactions) {
             if (displayPositive.getAmount() > 0) {
                 System.out.println(displayPositive);
@@ -209,7 +185,7 @@ public class FinancialTracker {
     }
 
     private static void displayPayments() {
-        printLedgerHeader();
+        printLedgerHeaderAndSort();
         for (Transaction displayNegative : transactions) {
             if (displayNegative.getAmount() < 0) {
                 System.out.println(displayNegative);
@@ -242,7 +218,7 @@ public class FinancialTracker {
                     LocalDate start = today.withDayOfMonth(1);
                     LocalDate end = today;
 
-                    printLedgerHeader();
+                    printLedgerHeaderAndSort();
                     filterTransactionsByDate(start, end);
                 }
                 case "2" -> {
@@ -251,7 +227,7 @@ public class FinancialTracker {
                     LocalDate start = today.minusMonths(1).withDayOfMonth(1);
                     LocalDate end = today.withDayOfMonth(1).minusDays(1);
 
-                    printLedgerHeader();
+                    printLedgerHeaderAndSort();
                     filterTransactionsByDate(start, end);
                 }
                 case "3" -> {
@@ -260,7 +236,7 @@ public class FinancialTracker {
                     LocalDate start = today.withDayOfYear(1);
                     LocalDate end = today;
 
-                    printLedgerHeader();
+                    printLedgerHeaderAndSort();
                     filterTransactionsByDate(start, end);
                 }
                 case "4" -> {
@@ -269,14 +245,14 @@ public class FinancialTracker {
                     LocalDate start = today.minusYears(1).withDayOfYear(1);
                     LocalDate end = today.withDayOfYear(1).minusDays(1);
 
-                    printLedgerHeader();
+                    printLedgerHeaderAndSort();
                     filterTransactionsByDate(start, end);
                 }
                 case "5" -> {
                     System.out.print("Vendor name: ");
                     String userInput = scanner.nextLine();
 
-                    printLedgerHeader();
+                    printLedgerHeaderAndSort();
                     filterTransactionsByVendor(userInput);
 
                 }
@@ -324,8 +300,9 @@ public class FinancialTracker {
 
         System.out.print("Amount      (blank = none): ");
         String amount = scanner.nextLine();
+        Double parseAmount = parseDouble(amount);
 
-        printLedgerHeader();
+        printLedgerHeaderAndSort();
 
         LocalDate parseStartDate = parseDate(startDate);
         LocalDate parseEndDate = parseDate(endDate);
@@ -355,7 +332,7 @@ public class FinancialTracker {
                 matches = false;
             }
             // Checks if not empty and amount is the same
-            if (!amount.isEmpty() && Math.abs(money - Double.parseDouble(amount)) > 0.001) {
+            if (!amount.isEmpty() && parseAmount != null && Math.abs(money - parseAmount) > 0.001) {
                 matches = false;
             }
             // Checks all that match then prints it out
@@ -386,28 +363,28 @@ public class FinancialTracker {
         }
     }
 
-    private static void printLedgerHeader() {
+    private static void printLedgerHeaderAndSort() {
         System.out.println(String.format(GOLD + "%-10s" + RESET + "|" + GOLD + "%-10s" + RESET + "|" + GOLD + "%-30s" + RESET + "|" + GOLD + "%-20s" + RESET + "|" + GOLD + "%-6s" + RESET, "Date", "Time", "Description", "Vendor", "Amount"));
         System.out.println("--------------------------------------------------------------------------------------");
+
+        // Sort Transaction from the dates, newest to oldest by reversing it.
+        Collections.sort(transactions, Comparator.comparing(Transaction::getDate).thenComparing(Transaction::getTime).reversed());
     }
 
-    private static String[] getTransactionsInput(Scanner scanner, boolean inputAmount) {
-        String dateTime;
-        String description;
-        String vendor;
-        double amount;
-
+    private static Transaction getTransactionsInput(Scanner scanner, boolean inputAmount) {
         LocalDate date;
         LocalTime time;
+        String description;
+        String vendor;
+        Double amount;
 
         while (true) {
             System.out.print("Date & time (yyyy-MM-dd HH:mm:ss): ");
-            dateTime = scanner.nextLine();
-
+            String input = scanner.nextLine();
 
             try {
                 // Got the format for the date and then separated them into their own variables
-                LocalDateTime dateTimeFMT = LocalDateTime.parse(dateTime, DATETIME_FMT);
+                LocalDateTime dateTimeFMT = LocalDateTime.parse(input, DATETIME_FMT);
                 date = dateTimeFMT.toLocalDate();
                 time = dateTimeFMT.toLocalTime();
                 break;
@@ -421,16 +398,17 @@ public class FinancialTracker {
         } while (description.isEmpty());
 
         do {
-            System.out.println("Vendor: ");
+            System.out.print("Vendor: ");
             vendor = scanner.nextLine();
         } while (vendor.isEmpty());
 
         while (true) {
-            System.out.println("Amount (positive): ");
-            amount = scanner.nextDouble();
-            scanner.nextLine();
+            System.out.print("Amount (positive): ");
+            String input = scanner.nextLine();
 
-            if (amount > 0) {
+            amount = parseDouble(input);
+
+            if (amount != null  && amount > 0) {
                 break;
             } else {
                 System.out.println("Invalid amount");
@@ -439,7 +417,7 @@ public class FinancialTracker {
         if (inputAmount) {
             amount = -amount;
         }
-        return new String[]{date.toString(), time.toString(), description, vendor, String.valueOf(amount)};
+        return new Transaction(date, time, description, vendor, amount);
     }
 
     private static void saveTransactions(Transaction saveObject) {
