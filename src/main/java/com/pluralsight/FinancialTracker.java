@@ -33,6 +33,8 @@ public class FinancialTracker {
 
     private static final String GOLD = "\u001B[1m\u001B[33m";
     private static final String RESET = "\u001B[0m";
+    private static final String GREEN  = "\u001B[32m";
+
 
     /* ------------------------------------------------------------------
        Main menu
@@ -42,6 +44,8 @@ public class FinancialTracker {
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
+
+        welcomeScreen();
 
         while (running) {
             System.out.println("\nWelcome to TransactionApp");
@@ -428,5 +432,18 @@ public class FinancialTracker {
         } catch (Exception e) {
             System.out.println("Couldn't save transaction!");
         }
+    }
+
+    private static void welcomeScreen() {
+        System.out.println(GOLD + "  +------------------------------------------------------------------+");
+        System.out.println(GOLD + "  |                                                                  |");
+        System.out.println(GOLD + "  |                   " + GREEN +"__" + GOLD + "                                             |" + RESET);
+        System.out.println(GOLD + "  |    " + GREEN + "              / _)" + GOLD + "  WELCOME TO YOUR   " + GOLD + "\t\t\t\t\t\t |" + RESET);
+        System.out.println(GOLD + "  |    " + GREEN + "     _.----._/ /     " + GOLD + "   LEDGER APP       " + GOLD + "\t\t\t\t\t |" + RESET);
+        System.out.println(GOLD + "  |    " + GREEN + "    /         /    " + GOLD + "$ $ $ $ $ $ $ $ $   " + "\t\t\t\t\t\t |" + RESET);
+        System.out.println(GOLD + "  |    " + GREEN + " __/ (  | (  |                                   " + GOLD + "\t\t\t |" + RESET);
+        System.out.println(GOLD + "  |    " +  GREEN + "/__.-'|_|--|_|                                   " + GOLD + "\t\t\t |" + RESET);
+        System.out.println(GOLD + "  |                                                                  |" + RESET);
+        System.out.println(GOLD + "  +------------------------------------------------------------------+" + RESET);
     }
 }
